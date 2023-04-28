@@ -163,3 +163,37 @@ Run3 = {
     'data_Run3F' : tnpSample('data_Run3F' , eosRun3 + 'ntuple_Run3_data_2022F_EleID_PhoID/data/EGamma/crab_Egamma2022F_EleID_PhoID/221114_171125/0000/merged.root' , lumi = 4.99),
     'data_Run3G' : tnpSample('data_Run3G' , eosRun3 + 'ntuple_Run3_data_2022G_EleID_PhoID/data/EGamma/crab_Egamma2022G_EleID_PhoID/221211_201213/0000/merged.root' , lumi = 2.43),
 }
+
+Run3_preleak = {
+    'DY_madgraph'              : tnpSample('DY_madgraph',
+                                       eosRun3 + '124X_preLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_preLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110236/0000/merged.root',
+                                       isMC = True, nEvts =  -1 ),
+#    'DY_amcatnlo'                 : tnpSample('DY_amcatnlo',
+#                                       eosUL2017 + 'DYJetsToLLM50amcatnloFXFX.root',
+#                                       isMC = True, nEvts =  -1 ),
+#    'DY_amcatnloext'                 : tnpSample('DY_amcatnloext',
+#                                       eosUL2017 + 'DYJetsToLL_amcatnloFXFX.root',
+#                                       isMC = True, nEvts =  -1 ),
+
+
+    'data_Run3B' : tnpSample('data_Run3B' , eosRun3 + 'ntuple_Run3_data_2022B_EleID_PhoID/data/EGamma/crab_Egamma2022B_EleID_PhoID/221012_155735/0000/merged.root' , lumi = 0.086),
+    'data_Run3C' : tnpSample('data_Run3C' , eosRun3 + 'ntuple_Run3_data_2022C_EleID_PhoID/data/EGamma/crab_Egamma2022C_EleID_PhoID/221014_145533/0000/merged.root' , lumi = 4.45),
+    'data_Run3D' : tnpSample('data_Run3D' , eosRun3 + 'ntuple_Run3_data_2022D_EleID_PhoID/data/EGamma/crab_Egamma2022D_EleID_PhoID/221014_145636/0000/merged.root' , lumi = 0.912),
+}
+
+Run3_postleak = {
+    'DY_madgraph'              : tnpSample('DY_madgraph',
+                                       eosRun3 + '124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110526/0000/merged_1.root',
+                                       isMC = True, nEvts =  -1 ),
+#    'DY_amcatnlo'                 : tnpSample('DY_amcatnlo',
+#                                       eosUL2017 + 'DYJetsToLLM50amcatnloFXFX.root',
+#                                       isMC = True, nEvts =  -1 ),
+#    'DY_amcatnloext'                 : tnpSample('DY_amcatnloext',
+#                                       eosUL2017 + 'DYJetsToLL_amcatnloFXFX.root',
+#                                       isMC = True, nEvts =  -1 ),
+
+
+    'data_Run3E' : tnpSample('data_Run3E' , eosRun3 + 'ntuple_Run3_data_2022E_EleID_PhoID/data/EGamma/crab_Egamma2022E_EleID_PhoID/221018_073725/0000/merged.root' , lumi = 2.08),
+    'data_Run3F' : tnpSample('data_Run3F' , eosRun3 + 'ntuple_Run3_data_2022F_EleID_PhoID/data/EGamma/crab_Egamma2022F_EleID_PhoID/221114_171125/0000/merged.root' , lumi = 4.99),
+    'data_Run3G' : tnpSample('data_Run3G' , eosRun3 + 'ntuple_Run3_data_2022G_EleID_PhoID/data/EGamma/crab_Egamma2022G_EleID_PhoID/221211_201213/0000/merged.root' , lumi = 2.43),
+}
