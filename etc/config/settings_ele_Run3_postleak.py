@@ -15,12 +15,21 @@ flags = {
     'passingMVA94Xwp90isoV2' : '(passingMVA94Xwp90isoV2 == 1)',
     'passingMVA94Xwp80noisoV2' : '(passingMVA94Xwp80noisoV2 == 1)',
     'passingMVA94Xwp90noisoV2' : '(passingMVA94Xwp90noisoV2 == 1)',
-    'passingMVA94XwpLisoV2'    : '(passingMVA94XwpLisoV2 == 1)',
-    'passingMVA94XwpLnoisoV2'  : '(passingMVA94XwpLnoisoV2 == 1)',
-    'passingMVA94XwpHZZisoV2'  : '(passingMVA94XwpHZZisoV2 == 1)',
+    'passingCutBasedVeto122XV1'    : '(passingCutBasedVeto122XV1 == 1)',
+    'passingCutBasedLoose122XV1'    : '(passingCutBasedLoose122XV1 == 1)',
+    'passingCutBasedMedium122XV1'    : '(passingCutBasedMedium122XV1 == 1)',
+    'passingCutBasedTight122XV1'    : '(passingCutBasedTight122XV1 == 1)',
+    'passingMVA122Xwp80isoV1'    : '(passingMVA122Xwp80isoV1 == 1)',
+    'passingMVA122Xwp90isoV1'    : '(passingMVA122Xwp90isoV1 == 1)',
+    'passingCutBasedVetoRun3V1'    : '(passingCutBasedVetoRun3V1 == 1)',
+    'passingCutBasedLooseRun3V1'    : '(passingCutBasedLooseRun3V1 == 1)',
+    'passingCutBasedMediumRun3V1'    : '(passingCutBasedMediumRun3V1 == 1)',
+    'passingCutBasedTightRun3V1'    : '(passingCutBasedTightRun3V1 == 1)',
+    'passingMVARun3Xwp80isoV1'    : '(passingMVARun3Xwp80isoV1 == 1)',
+    'passingMVARun3Xwp90isoV1'    : '(passingMVARun3Xwp90isoV1 == 1)',
     }
 
-baseOutDir = 'results/Run3_postleak/tnpEleID/'
+baseOutDir = 'results/Run3_postleak_new/tnpEleID/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -31,15 +40,15 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'tnpEleIDs'
 
 samplesDef = {
-    'data'   : tnpSamples.Run3['data_Run3E'].clone(),
-    'mcNom'  : tnpSamples.Run3['DY_madgraph'].clone(),
+    'data'   : tnpSamples.Run3_postleak['data_Run3E'].clone(),
+    'mcNom'  : tnpSamples.Run3_postleak['DY_madgraph'].clone(),
     #'mcAlt'  : tnpSamples.Run3['DY_amcatnloext'].clone(),
-    'tagSel' : tnpSamples.Run3['DY_madgraph'].clone(),
+    'tagSel' : tnpSamples.Run3_postleak['DY_madgraph'].clone(),
 }
 
 ## can add data sample easily
-samplesDef['data'].add_sample( tnpSamples.Run3['data_Run3F'] )
-samplesDef['data'].add_sample( tnpSamples.Run3['data_Run3G'] )
+samplesDef['data'].add_sample( tnpSamples.Run3_postleak['data_Run3F'] )
+samplesDef['data'].add_sample( tnpSamples.Run3_postleak['data_Run3G'] )
 
 ## some sample-based cuts... general cuts defined here after
 ## require mcTruth on MC DY samples and additional cuts
@@ -61,20 +70,20 @@ if not samplesDef['tagSel'] is None:
 
 ## set MC weight, can use several pileup rw for different data taking periods
 #weightName = 'weights_data_Run2022_B-G.totWeight'
-weightName = 'weights_data_Run2022_inclusive.totWeight'
+weightName = 'weights_data_Run2022EFG.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
 #if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/ec/fmausolf/EGM_comm/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110526/0000/DY_powheg_ele.pu.puTree_1.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/ec/nkasarag/EGM_comm/PU/EFG_2022/mcRun3_130X_2022_realistic_postEE_ele_80mb.pu.puTree.root')
 #if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('/eos/cms/store/group/phys_egamma/swmukher/UL2017/PU_miniAOD/DY_amcatnloext_ele.pu.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/ec/fmausolf/EGM_comm/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110526/0000/DY_powheg_ele.pu.puTree_1.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/ec/nkasarag/EGM_comm/PU/EFG_2022/mcRun3_130X_2022_realistic_postEE_ele_80mb.pu.puTree.root')
 
 #############################################################
 ########## bining definition  [can be nD bining]
 #############################################################
 biningDef = [
    { 'var' : 'el_sc_eta' , 'type': 'float', 'bins': [-2.5,-2.0,-1.566,-1.4442, -0.8, 0.0, 0.8, 1.4442, 1.566, 2.0, 2.5] },
-   { 'var' : 'el_pt' , 'type': 'float', 'bins': [10,20,35,50,100,500] },
+   { 'var' : 'el_pt' , 'type': 'float', 'bins': [10,20,35,50,100,200,500] },
 ]
 
 #############################################################

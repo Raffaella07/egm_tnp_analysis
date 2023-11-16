@@ -16,7 +16,7 @@ eosUL2016postVFP = '/eos/cms/store/group/phys_egamma/tnpTuples/rasharma/2021-02-
 eosUL2017 = '/eos/cms/store/group/phys_egamma/tnpTuples/tomc/2020-05-20/UL2017/merged/'
 eosUL2018 = '/eos/cms/store/group/phys_egamma/tnpTuples/tomc/2020-05-20/UL2018/merged/'
 #Run3
-eosRun3 = '/eos/cms/store/group/phys_egamma/ec/fmausolf/EGM_comm/'
+eosRun3 = '/eos/cms/store/group/phys_egamma/ec/nkasarag/EGM_comm/'
 
 
 ReReco2017 = {
@@ -166,7 +166,7 @@ Run3 = {
 
 Run3_preleak = {
     'DY_madgraph'              : tnpSample('DY_madgraph',
-                                       eosRun3 + '124X_preLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_preLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110236/0000/merged.root',
+                                       eosRun3 + 'Run3Summer22MiniAODv4-130X_mcRun3_2022_realistic_v5-v2/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/crab_Run3Summer22MiniAODv4-130X_mcRun3_2022_realistic_v5-v2/231027_151954/0000/merged_Run3Summer22MiniAODv4-130X_mcRun3_2022_realistic_v5-v2.root',
                                        isMC = True, nEvts =  -1 ),
 #    'DY_amcatnlo'                 : tnpSample('DY_amcatnlo',
 #                                       eosUL2017 + 'DYJetsToLLM50amcatnloFXFX.root',
@@ -183,7 +183,7 @@ Run3_preleak = {
 
 Run3_postleak = {
     'DY_madgraph'              : tnpSample('DY_madgraph',
-                                       eosRun3 + '124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/124X_postLeak_DYTo2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8_EleID_PhoID/230124_110526/0000/merged_1.root',
+                                       eosRun3 + 'Run3Summer22EEMiniAODv4-130X_mcRun3_2022_realistic_postEE_v6-v2/DYto2E_M-50_NNPDF31_TuneCP5_13p6TeV-powheg-pythia8/crab_Run3Summer22EEMiniAODv4-130X_mcRun3_2022_realistic_postEE_v6-v2/231027_152558/0000/merged_Run3Summer22EEMiniAODv4-130X_mcRun3_2022_realistic_postEE_v6-v2.root',
                                        isMC = True, nEvts =  -1 ),
 #    'DY_amcatnlo'                 : tnpSample('DY_amcatnlo',
 #                                       eosUL2017 + 'DYJetsToLLM50amcatnloFXFX.root',
@@ -193,7 +193,7 @@ Run3_postleak = {
 #                                       isMC = True, nEvts =  -1 ),
 
 
-    'data_Run3E' : tnpSample('data_Run3E' , eosRun3 + 'ntuple_Run3_data_2022E_EleID_PhoID/data/EGamma/crab_Egamma2022E_EleID_PhoID/221018_073725/0000/merged.root' , lumi = 2.08),
-    'data_Run3F' : tnpSample('data_Run3F' , eosRun3 + 'ntuple_Run3_data_2022F_EleID_PhoID/data/EGamma/crab_Egamma2022F_EleID_PhoID/221114_171125/0000/merged.root' , lumi = 4.99),
-    'data_Run3G' : tnpSample('data_Run3G' , eosRun3 + 'ntuple_Run3_data_2022G_EleID_PhoID/data/EGamma/crab_Egamma2022G_EleID_PhoID/221211_201213/0000/merged.root' , lumi = 2.43),
+    'data_Run3E' : tnpSample('data_Run3E' , eosRun3 + 'Run2022E-22Sep2023-v1/EGamma/crab_Run2022E-22Sep2023-v1/231027_143318/0000/merged_Run2022E-22Sep2023-v1_up.root' , lumi = 5.62),
+    'data_Run3F' : tnpSample('data_Run3F' , '/eos/cms/store/group/phys_egamma/ec/tnpTuples/rsalvatico/ntuples_Run3/PromptData2022/Run2022F.root' , lumi = 10),
+    'data_Run3G' : tnpSample('data_Run3G' , '/eos/cms/store/group/phys_egamma/ec/tnpTuples/rsalvatico/ntuples_Run3/PromptData2022/Run2022G.root' , lumi = 11.1),
 }
