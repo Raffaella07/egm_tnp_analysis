@@ -33,7 +33,7 @@ public:
   void setOutputFile(TFile *fOut ) {_fOut = fOut;}
   void fits(bool mcTruth,bool isMC,std::string title = "", bool isaddGaus=false);
   void useMinos(bool minos = true) {_useMinos = minos;}
-  void textParForCanvas(RooFitResult *resP, RooFitResult *resF, TPad *p);
+  void textParForCanvas(RooFitResult *resP, RooFitResult *resF, double chi2Pass,double chi2Fail, TPad *p);
   
   void fixSigmaFtoSigmaP(bool fix=true) { _fixSigmaFtoSigmaP= fix;}
 
@@ -124,13 +124,18 @@ void tnpFitter::setWorkspace(std::vector<std::string> workspace, bool isaddGaus)
   _work->factory(TString::Format("nBkgP[%f,0.5,%f]",_nTotP*0.1,_nTotP*1.5));
   _work->factory(TString::Format("nSigF[%f,0.5,%f]",_nTotF*0.9,_nTotF*1.5));
   _work->factory(TString::Format("nBkgF[%f,0.5,%f]",_nTotF*0.1,_nTotF*1.5));
+//  _work->factory(TString::Format("gausFracF[%f,0.5,%f]",_nTotF*0.1,_nTotF*1.5));
   _work->factory("SUM::pdfPass(nSigP*sigPass,nBkgP*bkgPass)");
   
   if (isaddGaus) {
+   // _work->factory("SUM::bkgFail(bkgFail_exp*nBkgF,sigGaussFail*gausFracF");
+   // _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
     _work->factory("SUM::pdfFail(expr('sigFracF*nSigF',{sigFracF,nSigF})*sigFail,nBkgF*bkgFail, expr('(1.-sigFracF)*nSigF',{sigFracF,nSigF})*sigGaussFail)");
+  //  _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail");
   } 
   else {
     _work->factory("SUM::pdfFail(nSigF*sigFail,nBkgF*bkgFail)");
+	
   }
   _work->Print();			         
 }
@@ -138,10 +143,13 @@ void tnpFitter::setWorkspace(std::vector<std::string> workspace, bool isaddGaus)
 void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
 
   cout << " title : " << title << endl;
+  cout << " title_compiled : " << title << endl;
 
   
   RooAbsPdf *pdfPass = _work->pdf("pdfPass");
   RooAbsPdf *pdfFail = _work->pdf("pdfFail");
+//  RooFitResult* resPass_narrow;  
+//  RooFitResult* resFail_narrow;
   RooFitResult* resPass;  
   RooFitResult* resFail;
 
@@ -162,21 +170,44 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
 
   /// FC: seems to be better to change the actual range than using a fitRange in the fit itself (???)
   /// FC: I don't know why but the integral is done over the full range in the fit not on the reduced range
+  //simple strategy for iterative fitting - restrict the range fit to initialize parameters -> enlarge to finalize fit 
+ // _work->var("x")->setRange(_xFitMin*1.25,_xFitMax*0.80);
+  // if (isMC==0) resPass_narrow = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
+
+  
+ 
   _work->var("x")->setRange(_xFitMin,_xFitMax);
   _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
+
+//  _work->var("x")->Print(); 
+  
   if( isMC == 1 ) resPass = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kTRUE),Save(),Range("fitMassRange"));
   else resPass = pdfPass->fitTo(*_work->data("hPass"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
+ 
+  
+  RooDataHist rooPass("hPass","hPass",*_work->var("x"),*_work->data("hPass"));
+  //RooDataHist rooFail("hFail","hFail",*_work->var("x"),hFail); 
+  RooAbsReal* chi2Pass  = pdfPass->createChi2(rooPass,Range("fitMassRange") , DataError(RooAbsData::Poisson));
   //RooFitResult* resPass = pdfPass->fitTo(*_work->data("hPass"),Minos(_useMinos),SumW2Error(kTRUE),Save());
   if( _fixSigmaFtoSigmaP ) {
     _work->var("sigmaF")->setVal( _work->var("sigmaP")->getVal() );
     _work->var("sigmaF")->setConstant();
   }
-
+//  _work->var("x")->setRange("narrowFitMassRange",_xFitMin*1.25,_xFitMax*0.80);
   _work->var("sigmaF")->setVal(_work->var("sigmaP")->getVal());
   _work->var("sigmaF")->setRange(0.8* _work->var("sigmaP")->getVal(), 3.0* _work->var("sigmaP")->getVal());
+
+
+//  if( isMC == 1 ) resFail_narrow = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kTRUE),Save(),Range("narrowFitMassRange"));
+//  if(isMC ==0) resFail_narrow = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("narrowFitMassRange"));
+  //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+  _work->var("x")->setRange(_xFitMin,_xFitMax);
+  _work->var("x")->setRange("fitMassRange",_xFitMin,_xFitMax);
   if( isMC == 1 ) resFail = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kTRUE),Save(),Range("fitMassRange"));
   else resFail = pdfFail->fitTo(*_work->data("hFail"), Minimizer("Minuit2", "MIGRAD"), Minos(_useMinos), Strategy(2), SumW2Error(kFALSE),Save(),Range("fitMassRange"));
-  //RooFitResult* resFail = pdfFail->fitTo(*_work->data("hFail"),Minos(_useMinos),SumW2Error(kTRUE),Save());
+
+  RooDataHist rooFail("hFail","hFail",*_work->var("x"),*_work->data("hFail"));
+  RooAbsReal* chi2Fail  = pdfFail->createChi2(rooFail, Range("fitMassRange"), DataError(RooAbsData::Poisson));
 
   RooPlot *pPass = _work->var("x")->frame(60,120);
   RooPlot *pFail = _work->var("x")->frame(60,120);
@@ -196,7 +227,7 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
   TCanvas c("c","c",1100,450);
   c.Divide(3,1);
   TPad *padText = (TPad*)c.GetPad(1);
-  textParForCanvas( resPass,resFail, padText );
+  textParForCanvas( resPass,resFail,pPass->chiSquare(),pFail->chiSquare(), padText );
   c.cd(2); pPass->Draw();
   c.cd(3); pFail->Draw();
 
@@ -204,6 +235,8 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
   c.Write(TString::Format("%s_Canv",_histname_base.c_str()),TObject::kOverwrite);
   resPass->Write(TString::Format("%s_resP",_histname_base.c_str()),TObject::kOverwrite);
   resFail->Write(TString::Format("%s_resF",_histname_base.c_str()),TObject::kOverwrite);
+
+  cout << "________________________chi2 checks "<< chi2Pass->getVal()/rooPass.sumEntries() << " " << chi2Fail->getVal()/rooFail.sumEntries() << endl;  
 
   
 }
@@ -213,7 +246,7 @@ void tnpFitter::fits(bool mcTruth,bool isMC,string title, bool isaddGaus) {
 
 
 /////// Stupid parameter dumper /////////
-void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p) {
+void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF, double chi2Pass, double chi2Fail, TPad *p) {
 
   double eff = -1;
   double e_eff = 0;
@@ -235,6 +268,7 @@ void tnpFitter::textParForCanvas(RooFitResult *resP, RooFitResult *resF,TPad *p)
   text1->SetTextAlign(12);
 
   text1->AddText(TString::Format("* fit status pass: %d, fail : %d",resP->status(),resF->status()));
+  text1->AddText(TString::Format("* fit chi2 pass: %f, fail : %f",chi2Pass,chi2Fail));
   text1->AddText(TString::Format("* eff = %1.4f #pm %1.4f",eff,e_eff));
 
   //  text->SetTextSize(0.06);
