@@ -16,16 +16,22 @@ parser.add_argument('--sample'     , default='all'        , help = 'create histo
 parser.add_argument('--altSig'     , action='store_true'  , help = 'alternate signal model fit')
 parser.add_argument('--addGaus'    , action='store_true'  , help = 'add gaussian to alternate signal model failing probe')
 parser.add_argument('--altBkg'     , action='store_true'  , help = 'alternate background model fit')
+parser.add_argument('--doPol'     , action='store_true'  , help = 'alternate background model fit- polynomial')
 parser.add_argument('--doFit'      , action='store_true'  , help = 'fit sample (sample should be defined in settings.py)')
 parser.add_argument('--mcSig'      , action='store_true'  , help = 'fit MC nom [to init fit parama]')
 parser.add_argument('--doPlot'     , action='store_true'  , help = 'plotting')
 parser.add_argument('--sumUp'      , action='store_true'  , help = 'sum up efficiencies')
 parser.add_argument('--iBin'       , dest = 'binNumber'   , type = int,  default=-1, help='bin number (to refit individual bin)')
 parser.add_argument('--flag'       , default = None       , help ='WP to test')
+parser.add_argument('--flag2'       , default = None       , help ='WP2 to test')
 parser.add_argument('settings'     , default = None       , help = 'setting file [mandatory]')
 
 
 args = parser.parse_args()
+
+print args.flag
+print args.flag2
+
 
 print '===> settings %s <===' % args.settings
 importSetting = 'import %s as tnpConf' % args.settings.replace('/','.').split('.py')[0]
@@ -37,11 +43,11 @@ import libPython.binUtils  as tnpBiner
 import libPython.rootUtils as tnpRoot
 
 
-if args.flag is None:
+if args.flag is None and args.flag2 is None:
     print '[tnpEGM_fitter] flag is MANDATORY, this is the working point as defined in the settings.py'
     sys.exit(0)
     
-if not args.flag in tnpConf.flags.keys() :
+if not args.flag in tnpConf.flags.keys() and not args.flag2 in tnpConf.flags.keys() :
     print '[tnpEGM_fitter] flag %s not found in flags definitions' % args.flag
     print '  --> define in settings first'
     print '  In settings I found flags: '
@@ -103,11 +109,11 @@ if args.createHists:
             var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
             if sample.mcTruth:
                 var = { 'name' : 'pair_mass', 'nbins' : 80, 'min' : 50, 'max': 130 }
-            tnpHist.makePassFailHistograms( sample, tnpConf.flags[args.flag], tnpBins, var )
+            tnpHist.makePassFailHistograms( sample, tnpConf.flags[args.flag],tnpConf.flags[args.flag2], tnpBins, var )
     
     pool = Pool()
     pool.map(parallel_hists, tnpConf.samplesDef.keys())
-
+   # parallel_hists(tnpConf.samplesDef.keys()[0])
     sys.exit(0)
 
 
@@ -146,13 +152,15 @@ if  args.doFit:
                 tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit )
             elif args.altSig and args.addGaus:
                 tnpRoot.histFitterAltSig(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltSigFit_addGaus, 1)
-            elif args.altBkg:
-                tnpRoot.histFitterAltBkg(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit )
+            elif args.altBkg and args.doPol:
+                tnpRoot.histFitterAltBkg(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit_pol, 1  )
+            elif args.altBkg and not args.doPol:
+                tnpRoot.histFitterAltBkg(  sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParAltBkgFit, 0 )
             else:
                 tnpRoot.histFitterNominal( sampleToFit, tnpBins['bins'][ib], tnpConf.tnpParNomFit )
     pool = Pool()
     pool.map(parallel_fit, range(len(tnpBins['bins'])))
-
+    #parallel_fit(range(len(tnpBins['bins']))[0])
     args.doPlot = True
      
 ####################################################################

@@ -23,7 +23,7 @@ cdef void removeNegativeBins(TH1D* h):
 # To Fill Tag and Probe histograms
 ##################################
 
-def makePassFailHistograms( sample, flag, bindef, var ):
+def makePassFailHistograms( sample, flag,flag2, bindef, var ):
 
     #####################
     # C++ Initializations
@@ -44,6 +44,7 @@ def makePassFailHistograms( sample, flag, bindef, var ):
     cdef TChain* tree
 
     cdef TTreeFormula* flag_formula
+    cdef TTreeFormula* flag_formula2
     cdef vector[TTreeFormula*] bin_formulas
 
     cdef vector[TH1D*] hPass
@@ -62,25 +63,36 @@ def makePassFailHistograms( sample, flag, bindef, var ):
 
     for p in sample.path:
         print ' adding rootfile: ', p
-        tree.Add(str.encode(p))
+        tree.Add(p)
 
     if not sample.puTree is None:
         print ' - Adding weight tree: %s from file %s ' % (sample.weight.split('.')[0], sample.puTree)
-        tree.AddFriend(sample.weight.split('.')[0],sample.puTree)
+        tmp = sample.weight.split('.')[0]
+        tree.AddFriend(tmp,sample.puTree)
 
     #################################
     # Prepare hists, cuts and outfile
     #################################
 
-    cdef TFile* outfile = new TFile(str.encode(sample.histFile),'recreate')
+    cdef TFile* outfile = new TFile(sample.histFile,'recreate')
 
     cutBinList = []
 
-    flag_formula = new TTreeFormula('Flag_Selection', str.encode(flag), tree)
+    flag_formula = new TTreeFormula('Flag_Selection', flag, tree)
+    flag_formula2 = new TTreeFormula('Flag_Selection2', flag2, tree)
 
+    print flag_formula.GetName()
+    print flag_formula2.GetName()
+    name = str(flag_formula.GetName())
+    if name == '':
+            print "____in IF"
+            flag_formula = flag_formula2
+    print 'final formula', flag_formula.GetName()
     for ib in range(len(bindef['bins'])):
-        hPass.push_back(new TH1D('%s_Pass' % bindef['bins'][ib]['name'],bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
-        hFail.push_back(new TH1D('%s_Fail' % bindef['bins'][ib]['name'],bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
+        hPassLabel = bindef['bins'][ib]['name'] + '_Pass'
+        hFailLabel = bindef['bins'][ib]['name'] + '_Fail'
+        hPass.push_back(new TH1D(hPassLabel,bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
+        hFail.push_back(new TH1D(hFailLabel,bindef['bins'][ib]['title'],var['nbins'],var['min'],var['max']))
         hPass[ib].Sumw2()
         hFail[ib].Sumw2()
 
@@ -98,8 +110,8 @@ def makePassFailHistograms( sample, flag, bindef, var ):
             cutBin = '%s' % cuts
 
         cutBinList.append(cutBin)
-
-        bin_formulas.push_back(new TTreeFormula('%s_Selection' % bindef['bins'][ib]['name'], str.encode(cutBin), tree))
+        Selection =  bindef['bins'][ib]['name'] + '_Selection'
+        bin_formulas.push_back(new TTreeFormula(Selection, cutBin, tree))
 
         formulas_list.Add(<TObject*>bin_formulas[nbins])
 

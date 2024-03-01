@@ -95,9 +95,11 @@ def histFitterNominal( sample, tnpBin, tnpWorkspaceParam ):
     tnpWorkspace.extend(tnpWorkspaceFunc)
     
     ## init fitter
+    print sample.histFile
     infile = rt.TFile( sample.histFile, "read")
     hP = infile.Get('%s_Pass' % tnpBin['name'] )
     hF = infile.Get('%s_Fail' % tnpBin['name'] )
+    print hP.GetEntries()
     fitter = tnpFitter( hP, hF, tnpBin['name'] )
     infile.Close()
 
@@ -197,19 +199,33 @@ def histFitterAltSig( sample, tnpBin, tnpWorkspaceParam, isaddGaus=0 ):
 #############################################################
 ########## alternate background fitter
 #############################################################
-def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam ):
+def histFitterAltBkg( sample, tnpBin, tnpWorkspaceParam, isPol=0 ):
 
-    tnpWorkspaceFunc = [
-        "Gaussian::sigResPass(x,meanP,sigmaP)",
-        "Gaussian::sigResFail(x,meanF,sigmaF)",
-        "Exponential::bkgPass(x, alphaP)",
-        "Exponential::bkgFail(x, alphaF)",
-        ]
 
+    if isPol==0:
+        tnpWorkspaceFunc = [
+            "Gaussian::sigResPass(x,meanP,sigmaP)",
+            "Gaussian::sigResFail(x,meanF,sigmaF)",
+            "Exponential::bkgPass(x, alphaP)",
+            "Exponential::bkgFail(x, alphaF)",
+              ]
+        print  tnpWorkspaceFunc
+#    #Add gaussian shoulder for bins at lowPt
+    elif isPol==1:
+    	tnpWorkspaceFunc = [
+      	 	 "Gaussian::sigResPass(x,meanP,sigmaP)",
+       		 "Gaussian::sigResFail(x,meanF,sigmaF)",
+   	         "Chebychev::bkgPass(x,{a1_P,a2_P,a3_P,a4_P})",
+   	         "Chebychev::bkgFail(x, {a1_F,a2_F,a3_F,a4_F})",
+              ]
+
+        print  tnpWorkspaceFunc
     tnpWorkspace = []
+  
     tnpWorkspace.extend(tnpWorkspaceParam)
     tnpWorkspace.extend(tnpWorkspaceFunc)
-            
+
+          
     ## init fitter
     infile = rt.TFile(sample.histFile,'read')
     hP = infile.Get('%s_Pass' % tnpBin['name'] )
