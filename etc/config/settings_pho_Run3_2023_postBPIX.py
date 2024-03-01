@@ -28,7 +28,7 @@ flags = {
     }
 
 
-baseOutDir = 'results/Run3_preleak/tnpPhoID/'
+baseOutDir = 'results/Run3_2023_postBPIX/tnpPhoID/'
 
 #############################################################
 ########## samples definition  - preparing the samples
@@ -39,10 +39,10 @@ import etc.inputs.tnpSampleDef as tnpSamples
 tnpTreeDir = 'tnpPhoIDs'
 
 samplesDef = {
-    'data'   : tnpSamples.Run3_preleak['data_Run3BCD'].clone(),
-    'mcNom'  : tnpSamples.Run3_preleak['DY_madgraph'].clone(),
-    #'mcAlt'  : tnpSamples.Run3['DY_amcatnloext'].clone(),
-    'tagSel' : tnpSamples.Run3_preleak['DY_madgraph'].clone(),
+    'data'   : tnpSamples.Run3_2023_postBPIX['data_2023'].clone(),
+    'mcNom'  : tnpSamples.Run3_2023_postBPIX['DY_madgraph'].clone(),
+    'mcAlt'  : tnpSamples.Run3_2023_postBPIX['DY_amcatnlo'].clone(),
+    'tagSel' : tnpSamples.Run3_2023_postBPIX['DY_madgraph'].clone(),
 }
 ## can add data sample easily
 #samplesDef['data'].add_sample( tnpSamples.Run3_preleak['data_Run3C'] )
@@ -72,13 +72,13 @@ if not samplesDef['tagSel'] is None:
 #if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
 
 ## set MC weight, can use several pileup rw for different data taking 
-weightName = 'weights_data_Run2022BCD.totWeight'
+weightName = 'weights_data_Run2023D.totWeight'
 if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_weight(weightName)
-#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_weight(weightName)
 if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_weight(weightName)
-if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/ec/nkasarag/EGM_comm/PU/BCD_2022/mcRun3_130X_2022_realistic_pho_69p2mb.pu.puTree.root')
-#if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('/eos/cms/store/group/phys_egamma/swmukher/UL2017/PU_miniAOD/DY_amcatnloext_ele.pu.puTree.root')
-if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/ec/nkasarag/EGM_comm/PU/BCD_2022/mcRun3_130X_2022_realistic_pho_69p2mb.pu.puTree.root')
+if not samplesDef['mcNom' ] is None: samplesDef['mcNom' ].set_puTree('/eos/cms/store/group/phys_egamma/ec/tnpTuples/Prompt2023/pileupReweightingFiles/postBPIX/DY_amcatnloext_pho.pu.puTree.root')
+if not samplesDef['mcAlt' ] is None: samplesDef['mcAlt' ].set_puTree('/eos/cms/store/group/phys_egamma/ec/tnpTuples/Prompt2023/pileupReweightingFiles/postBPIX/DY_madgraph_pho.pu.puTree.root')
+if not samplesDef['tagSel'] is None: samplesDef['tagSel'].set_puTree('/eos/cms/store/group/phys_egamma/ec/tnpTuples/Prompt2023/pileupReweightingFiles/postBPIX/DY_amcatnloext_pho.pu.puTree.root')
 
 #############################################################
 ########## bining definition  [can be nD bining]
