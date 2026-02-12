@@ -10,10 +10,11 @@ Table of Contents
 Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 # Install stable branch
+Needs CMSSW_13 and over for python3 and easy parquet file handling
 
 ```bash
-cmsrel CMSSW_11_2_0
-cd CMSSW_11_2_0/src
+cmsrel CMSSW_13_3_0
+cd CMSSW_13_3_0/src
 cmsenv
 git clone git@github.com:cms-egamma/egm_tnp_analysis.git
 cd egm_tnp_analysis
@@ -71,27 +72,38 @@ Everything will be done for a specific flag (so the settings can be the same for
 
    ***CAUTION:*** when recreacting bins, the output directory is overwritten! So be sure to not redo that once you are at step2
 
-4. **Create the histograms** with the different cuts... this is the longest step. Histograms will not be re-done later
+4. **Create the histograms** with the different cuts... here logic has changed and we use a standalone script that
+- extracts from the setting file binning,selection and flag information
+- uses .paruet input
+- produces output histograms in .root file in a totally compatible format with the rest of the fitter 
 
+from now on use the --parquet flag  in your fitting and sumUp steps. 
+For MC
    ```bash
-   python tnpEGM_fitter.py etc/config/settings.py --flag myWP --createHists
+   python3 standalone_histogram_creator.py   --config etc/config/settings_ele_Run3_2025_C_parquet.py   --flag passingCutBasedMedium122XV1   --output ./results/   --sample-type mc
+
    ```
 
+For Data
+   ```bash
+   python3 standalone_histogram_creator.py   --config etc/config/settings_ele_Run3_2025_C_parquet.py   --flag passingCutBasedMedium122XV1   --output ./results/   --sample-type data
+
+   ```
 5. **Do your first round of fits.**
    
    ***KEEP IN MIND:*** please check that all of the fits have converged correctly and don't allow for extreme low mass tail variations as these can't be considered as valid fits (see S8 in presentation https://indico.cern.ch/event/1288547/contributions/5414376/attachments/2654622/4597206/26052023_RMS_EGamma.pdf) 
    1. nominal fit
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --parquet
       ```
 
    2. MC fit to constrain alternate signal parameters [note this is the only MC fit that makes sense]
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --mcSig --altSig
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --mcSig --altSig --parquet 
       ```
-      For some fits where we see one more peak tries to appear one can use `--addGaus` opton with altSig.
+      For some fits where we see one more peak tries to appear one can use `--addGaus` opton with altSig (not tested with parquet but should work!).
       ```bash
       python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --mcSig --addGaus --altSig
       ```
@@ -99,19 +111,19 @@ Everything will be done for a specific flag (so the settings can be the same for
    3. Alternate signal fit (using constraints from previous fits)
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altSig
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altSig --parquet 
       ```
       If one used `--addGaus` option in previous step then in this step you have to use the `--addGaus` option.
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altSig --addGaus
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altSig --addGaus --parquet 
       ```
 
    4. Alternate background fit (using constraints from previous fits)
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altBkg
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altBkg --parquet
       ```
-   5. Alternate signal + background fit (using constraints from previous fits)
+   5. Alternate signal + background fit (using constraints from previous fits) NOT TESTED for parquet, not used in last iterations either
 
       ```bash
       python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit  --altSigBkg
@@ -120,7 +132,7 @@ Everything will be done for a specific flag (so the settings can be the same for
       - can redo a given bin using its bin number ib. The bin number can be found from `--checkBins`, directly in the ouput dir (or web interface)
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --iBin ib
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --iBin ib --parquet
       ```
 
       the initial parameters can be tuned for this particular bin in the settings.py file. 
@@ -130,17 +142,21 @@ Everything will be done for a specific flag (so the settings can be the same for
    6. One can redo any kind of fit bin by bin. For instance the MC with altSig fit (if the constraint parameters were bad in the altSig for instance)
 
       ```bash
-      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --mcSig --altSig --iBin ib
+      python tnpEGM_fitter.py etc/config/settings.py --flag myWP --doFit --mcSig --altSig --iBin ib --parquet
       ```
 
-7. **egm txt ouput file.** Once all fits are fine, put everything in the egm format txt file
+7. **egm txt ouput file.** Once all fits are fine, put everything in the egm format txt file (here this flag triggers a check on whether altSel and altMC are used and if not, does not use it in plotting)
 
    ```bash
-   python tnpEGM_fitter.py etc/config/setting.py  --flag myWP --sumUp
+   python tnpEGM_fitter.py etc/config/setting.py  --flag myWP --sumUp --parquet 
    ```
    
 
 # The settings file
+- **Parquet run settings**
+
+Use etc/config/settings_ele_Run3_2025_C_parquet.py as ref.
+
 
 The settings (for example [settings_pho_UL2017.py](etc/config/settings_pho_UL2017.py)) file includes all the necessary information for a given setup of fit
 
