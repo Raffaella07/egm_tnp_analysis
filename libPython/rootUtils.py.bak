@@ -1,10 +1,10 @@
 import ROOT as rt
 import math
-from .fitUtils import *
+from fitUtils import *
 import ctypes
 
 def removeNegativeBins(h):
-    for i in range(h.GetNbinsX()):
+    for i in xrange(h.GetNbinsX()):
         if (h.GetBinContent(i) < 0):
             h.SetBinContent(i, 0)
 
@@ -13,11 +13,11 @@ def makePassFailHistograms( sample, flag, bindef, var ):
     ## open rootfile
     tree = rt.TChain(sample.tree)
     for p in sample.path:
-        print(' adding rootfile: ', p)
+        print ' adding rootfile: ', p
         tree.Add(p)
 
     if not sample.puTree is None:
-        print(' - Adding weight tree: %s from file %s ' % (sample.weight.split('.')[0], sample.puTree))
+        print ' - Adding weight tree: %s from file %s ' % (sample.weight.split('.')[0], sample.puTree)
         tree.AddFriend(sample.weight.split('.')[0],sample.puTree)
 
     ## open outputFile
@@ -74,14 +74,14 @@ def makePassFailHistograms( sample, flag, bindef, var ):
             itot  = (passI+failI)
             eff   = passI / (passI+failI)
             e_eff = math.sqrt(passI*passI*efail*efail + failI*failI*epass*epass) / (itot*itot)
-        print(cuts)
-        print('    ==> pass: %.1f +/- %.1f ; fail : %.1f +/- %.1f : eff: %1.3f +/- %1.3f' % (passI,epass,failI,efail,eff,e_eff))
+        print cuts
+        print '    ==> pass: %.1f +/- %.1f ; fail : %.1f +/- %.1f : eff: %1.3f +/- %1.3f' % (passI,epass,failI,efail,eff,e_eff)
     outfile.Close()
 
 
 def histPlotter( filename, tnpBin, plotDir ):
-    print('opening ', filename)
-    print('  get canvas: ' , '%s_Canv' % tnpBin['name'])
+    print 'opening ', filename
+    print '  get canvas: ' , '%s_Canv' % tnpBin['name']
     rootfile = rt.TFile(filename,"read")
 
     c = rootfile.Get( '%s_Canv' % tnpBin['name'] )
@@ -103,7 +103,6 @@ def computeEffi( n1,n2,e1,e2):
 import os.path
 def getAllEffi( info, bindef ):
     effis = {}
-    
     if not info['mcNominal'] is None and os.path.isfile(info['mcNominal']):
         rootfile = rt.TFile( info['mcNominal'], 'read' )
         hP = rootfile.Get('%s_Pass'%bindef['name'])
@@ -158,34 +157,25 @@ def getAllEffi( info, bindef ):
     if not info['dataNominal'] is None and os.path.isfile(info['dataNominal']) :
         rootfile = rt.TFile( info['dataNominal'], 'read' )
         from ROOT import RooFit,RooFitResult
-        
-        fitresP = rootfile.Get( '%s_resP' % bindef['name'] )
+        fitresP = rootfile.Get( '%s_resP' % bindef['name']  )
         fitresF = rootfile.Get( '%s_resF' % bindef['name'] )
+
+        fitP = fitresP.floatParsFinal().find('nSigP')
+        fitF = fitresF.floatParsFinal().find('nSigF')
         
-        if fitresP and fitresF:
-            fitP = fitresP.floatParsFinal().find('nSigP')
-            fitF = fitresF.floatParsFinal().find('nSigF')
-            
-            if fitP and fitF:
-                nP = fitP.getVal()
-                nF = fitF.getVal()
-                eP = fitP.getError()
-                eF = fitF.getError()
-            else:
-                nP = nF = eP = eF = -1
-        else:
-            nP = nF = eP = eF = -1
-            
+        nP = fitP.getVal()
+        nF = fitF.getVal()
+        eP = fitP.getError()
+        eF = fitF.getError()
         rootfile.Close()
 
-        if 'data' in info and info['data'] and os.path.isfile(info['data']):
-            rootfile = rt.TFile( info['data'], 'read' )
-            hP = rootfile.Get('%s_Pass'%bindef['name'])
-            hF = rootfile.Get('%s_Fail'%bindef['name'])
+        rootfile = rt.TFile( info['data'], 'read' )
+        hP = rootfile.Get('%s_Pass'%bindef['name'])
+        hF = rootfile.Get('%s_Fail'%bindef['name'])
 
-            #if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
-            #if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
-            rootfile.Close()
+        #if eP > math.sqrt(hP.Integral()) : eP = math.sqrt(hP.Integral())
+        #if eF > math.sqrt(hF.Integral()) : eF = math.sqrt(hF.Integral())
+        rootfile.Close()
 
         effis['dataNominal'] = computeEffi(nP,nF,eP,eF)
     else:
